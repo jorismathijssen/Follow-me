@@ -1,0 +1,7 @@
+//edit me and rename to config.php
+<?php
+$servername = "localhost";
+$username = "YourUser";
+$password = "YourPass";
+$dbname = "YourDatabase";
+?>

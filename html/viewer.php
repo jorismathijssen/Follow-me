@@ -440,6 +440,27 @@
 </head>
 
 <body>
+    <?php
+include 'config.php';
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+$sql = "INSERT INTO locations (id, name, longitude, latitude)
+VALUES ('01', 'Doe', '52.1265', '62.54154144')";
+
+if ($conn->query($sql) === TRUE) {
+    echo "New record created successfully";
+} else {
+    echo "Error: " . $sql . "<br>" . $conn->error;
+}
+
+$conn->close();
+?>
+?>
     <!--<div id="pano" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; z-index:-1;"></div>
     <div id="controls">
         <div id="map" style="width: 400px; height: 300px; float: left; padding: 0;"></div>
