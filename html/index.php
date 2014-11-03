@@ -440,18 +440,6 @@
 </head>
 
 <body>
-    <div id="pano" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; z-index:-1;"></div>
-    <div id="controls">
-        <div id="map" style="width: 400px; height: 300px; float: left; padding: 0;"></div>
-        <div id="controls" style="">
-            <form id="map_form">
-                <input type="text" name="address" id="address" />
-                <button type="submit" id="searchButton">Search</button>
-            </form>
-        </div>
-        <div id="text" style="width: 500px; height: 120px; float: left; padding-top: 10px; z-index:0; border-style:solid; border-width:medium;"></div>
-    </div>
-
 
 </body>
 
