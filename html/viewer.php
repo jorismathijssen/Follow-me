@@ -88,6 +88,27 @@
                     snapToRoad(start_pin.getPosition(), function (result) {
                         start_pin.setPosition(result);
                         start_point = result;
+                        var lat = pivot_pin.getPosition().lat();
+                        var lng = pivot_pin.getPosition().lng();
+                        //use an AJAX function to save the lat/lng to the data base
+                        $.ajax({
+                            type: 'POST',
+                            data: {
+                                latitude: lat,
+                                longitude: lng
+                            },
+                            url: "savecords.php",
+                            success: function(response) {
+                                if (response == "success") {
+                                    console.log(response);
+                                } else {
+                                    console.log(response);
+                                }
+                            },
+                            error: function() {
+                                alert('An error occured');
+                            }
+                        });
                         changeHash();
                     });
                 });
@@ -102,6 +123,27 @@
                     snapToRoad(end_pin.getPosition(), function (result) {
                         end_pin.setPosition(result);
                         end_point = result;
+                        var lat = pivot_pin.getPosition().lat();
+                        var lng = pivot_pin.getPosition().lng();
+                        //use an AJAX function to save the lat/lng to the data base
+                        $.ajax({
+                            type: 'POST',
+                            data: {
+                                latitude: lat,
+                                longitude: lng
+                            },
+                            url: "savecords.php",
+                            success: function(response) {
+                                if (response == "success") {
+                                    console.log(response);
+                                } else {
+                                    console.log(response);
+                                }
+                            },
+                            error: function() {
+                                alert('An error occured');
+                            }
+                        });
                         changeHash();
                     });
                 });
@@ -114,27 +156,6 @@
 
                 google.maps.event.addListener(pivot_pin, 'dragend', function (event) {
                     hyperlapse.setLookat(pivot_pin.getPosition());
-                    var lat = pivot_pin.getPosition().lat();
-                    var lng = pivot_pin.getPosition().lng();
-                    //use an AJAX function to save the lat/lng to the data base
-                    $.ajax({
-                        type: 'POST',
-                        data: {
-                            latitude: lat,
-                            longitude: lng
-                        },
-                        url: "savecords.php",
-                        success: function(response) {
-                            if (response == "success") {
-                                console.log(response);
-                            } else {
-                                console.log(response);
-                            }
-                        },
-                        error: function() {
-                            alert('An error occured');
-                        }
-                    });
                     changeHash();
                 });
 
@@ -257,6 +278,35 @@
                     //hyperlapse.position.y = py;
                 }, false);
 
+                var myBtn = document.getElementById('myBtn');
+
+                tester.addEventListener('click', function(event) {
+                    $.ajax({
+                        url: 'getcords.php',
+                        data: "dataString",
+                        dataType: 'html',
+                        success: function(data)
+                        {
+                            $('#output').html();
+
+                            $('#output').html(data);
+                        }
+                    });
+                });
+
+                save.addEventListener('click', function(event) {
+                    $.ajax({
+                        url: 'getcords.php',
+                        data: "dataString",
+                        dataType: 'html',
+                        success: function(data)
+                        {
+                            $('#output').html();
+
+                            $('#output').html(data);
+                        }
+                    });
+                });
 
 
                 /* Dat GUI */
@@ -334,6 +384,7 @@
                         });
                     }
                 };
+                /*
 
 
                 var scn = gui.addFolder('screen');
@@ -417,6 +468,7 @@
                 gui.add(o, 'drop_pins');
                 gui.add(o, 'generate');
                 gui.add(hyperlapse, 'load');
+*/
 
 
                 window.addEventListener('resize', function () {
@@ -465,8 +517,11 @@
                 <form id="map_form">
                     <input type="text" name="address" id="address" />
                     <button type="submit" id="searchButton">Search</button>
+                    <button id="save">Sla punten op</button>
                 </form>
             </div>
+            <textarea rows="30" cols="65" id="output"></textarea>
+            <button id="tester">test</button>
         </div>
 
     </body>

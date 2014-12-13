@@ -6,6 +6,7 @@
         <title>Follow Me - Joris Mathijssen</title>
 
         <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false" type="text/javascript"></script>
+        <script src="http://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js" type="text/javascript"></script>
         <script src="js/dat.gui.min.js"></script>
         <script src="js/three.min.js"></script>
         <script src="js/GSVPano.js"></script>
@@ -19,10 +20,6 @@
             var start_pin, end_pin, pivot_pin, camera_pin;
             var _elevation = 0;
             var _route_markers = [];
-
-            function show(msg) {
-                document.getElementById("text").innerHTML = msg;
-            }
 
             function init() {
 
@@ -42,7 +39,7 @@
                         destination: point,
                         travelMode: google.maps.TravelMode["DRIVING"]
                     };
-                    directions_service.route(request, function(response, status) {
+                    directions_service.route(request, function (response, status) {
                         if (status == "OK") callback(response.routes[0].overview_path[0]);
                         else callback(null);
                     });
@@ -87,8 +84,8 @@
                     map: map
                 });
 
-                google.maps.event.addListener(start_pin, 'dragend', function(event) {
-                    snapToRoad(start_pin.getPosition(), function(result) {
+                google.maps.event.addListener(start_pin, 'dragend', function (event) {
+                    snapToRoad(start_pin.getPosition(), function (result) {
                         start_pin.setPosition(result);
                         start_point = result;
                         changeHash();
@@ -101,8 +98,8 @@
                     map: map
                 });
 
-                google.maps.event.addListener(end_pin, 'dragend', function(event) {
-                    snapToRoad(end_pin.getPosition(), function(result) {
+                google.maps.event.addListener(end_pin, 'dragend', function (event) {
+                    snapToRoad(end_pin.getPosition(), function (result) {
                         end_pin.setPosition(result);
                         end_point = result;
                         changeHash();
@@ -115,27 +112,26 @@
                     map: map
                 });
 
-                google.maps.event.addListener(pivot_pin, 'dragend', function(event) {
+                google.maps.event.addListener(pivot_pin, 'dragend', function (event) {
                     hyperlapse.setLookat(pivot_pin.getPosition());
-
                     changeHash();
                 });
 
                 function findAddress(address) {
                     geocoder.geocode({
                         'address': address
-                    }, function(results, status) {
+                    }, function (results, status) {
                         if (status == google.maps.GeocoderStatus.OK) {
                             map.setCenter(results[0].geometry.location);
                             o.drop_pins();
                         } else {
-                            show("Geocode was not successful for the following reason: " + status);
+                            console.log("Geocode was not successful for the following reason: " + status);
                         }
                     });
                 }
 
                 var search = document.getElementById('searchButton');
-                search.addEventListener('click', function(event) {
+                search.addEventListener('click', function (event) {
                     event.preventDefault();
                     findAddress(document.getElementById("address").value);
                 }, false);
@@ -164,11 +160,11 @@
 
 
 
-                hyperlapse.onError = function(e) {
-                    show("ERROR: " + e.message);
+                hyperlapse.onError = function (e) {
+                    console.log("ERROR: " + e.message);
                 };
 
-                hyperlapse.onRouteProgress = function(e) {
+                hyperlapse.onRouteProgress = function (e) {
                     _route_markers.push(new google.maps.Marker({
                         position: e.point.location,
                         draggable: false,
@@ -177,34 +173,34 @@
                     }));
                 };
 
-                hyperlapse.onRouteComplete = function(e) {
+                hyperlapse.onRouteComplete = function (e) {
                     directions_renderer.setDirections(e.response);
-                    show("Number of Points: " + hyperlapse.length());
+                    console.log("Number of Points: " + hyperlapse.length());
                     hyperlapse.load();
                 };
 
-                hyperlapse.onLoadProgress = function(e) {
-                    show("Loading: " + (e.position + 1) + " of " + hyperlapse.length());
+                hyperlapse.onLoadProgress = function (e) {
+                    console.log("Loading: " + (e.position + 1) + " of " + hyperlapse.length());
                 };
 
-                hyperlapse.onLoadComplete = function(e) {
-                    show("" +
-                         "Start: " + start_pin.getPosition().toString() +
-                         "<br>End: " + end_pin.getPosition().toString() +
-                         "<br>Lookat: " + pivot_pin.getPosition().toString() +
-                         "<br>Ready.");
+                hyperlapse.onLoadComplete = function (e) {
+                    console.log("" +
+                                "Start: " + start_pin.getPosition().toString() +
+                                "<br>End: " + end_pin.getPosition().toString() +
+                                "<br>Lookat: " + pivot_pin.getPosition().toString() +
+                                "<br>Ready.");
                 };
 
-                hyperlapse.onFrame = function(e) {
-                    show("" +
-                         "Start: " + start_pin.getPosition().toString() +
-                         "<br>End: " + end_pin.getPosition().toString() +
-                         "<br>Lookat: " + pivot_pin.getPosition().toString() +
-                         "<br>Position: " + (e.position + 1) + " of " + hyperlapse.length());
+                hyperlapse.onFrame = function (e) {
+                    console.log("" +
+                                "Start: " + start_pin.getPosition().toString() +
+                                "<br>End: " + end_pin.getPosition().toString() +
+                                "<br>Lookat: " + pivot_pin.getPosition().toString() +
+                                "<br>Position: " + (e.position + 1) + " of " + hyperlapse.length());
                     camera_pin.setPosition(e.point.location);
                 };
 
-                pano.addEventListener('mousedown', function(e) {
+                pano.addEventListener('mousedown', function (e) {
                     e.preventDefault();
 
                     is_moving = true;
@@ -217,7 +213,7 @@
 
                 }, false);
 
-                pano.addEventListener('mousemove', function(e) {
+                pano.addEventListener('mousemove', function (e) {
                     e.preventDefault();
                     var f = hyperlapse.fov() / 500;
 
@@ -233,176 +229,54 @@
 
                 }, false);
 
-                pano.addEventListener('mouseup', function() {
+                pano.addEventListener('mouseup', function () {
                     is_moving = false;
 
                     hyperlapse.position.x = px;
                     //hyperlapse.position.y = py;
                 }, false);
 
+                var myBtn = document.getElementById('myBtn');
 
+                tester.addEventListener('click', function(event) {
+                    $.ajax({
+                        url: 'getcords.php',
+                        data: "dataString",
+                        dataType: 'html',
+                        success: function(data)
+                        {
+                            $('#output').html();
 
-                /* Dat GUI */
-
-                var gui = new dat.GUI();
-
-                var o = {
-                    distance_between_points: 10,
-                    max_points: 100,
-                    fov: 80,
-                    elevation: Math.floor(_elevation),
-                    tilt: 0,
-                    millis: 50,
-                    offset_x: 0,
-                    offset_y: 0,
-                    offset_z: 0,
-                    position_x: 0,
-                    position_y: 0,
-                    use_lookat: true,
-                    screen_width: window.innerWidth,
-                    screen_height: window.innerHeight,
-                    generate: function() {
-                        show("Generating route...");
-
-                        directions_renderer.setDirections({
-                            routes: []
-                        });
-
-                        var marker;
-                        while (_route_markers.length > 0) {
-                            marker = _route_markers.pop();
-                            marker.setMap(null);
+                            $('#output').html(data);
                         }
+                    });
+                });
 
-                        request = {
-                            origin: start_point,
-                            destination: end_point,
-                            travelMode: google.maps.DirectionsTravelMode.DRIVING
-                        };
-
-                        directions_service.route(request, function(response, status) {
-                            if (status == google.maps.DirectionsStatus.OK) {
-                                hyperlapse.generate({
-                                    route: response
-                                });
+                save.addEventListener('click', function(event) {
+                    var lat = pivot_pin.getPosition().lat();
+                    var lng = pivot_pin.getPosition().lng();
+                    //use an AJAX function to save the lat/lng to the data base
+                    $.ajax({
+                        type: 'POST',
+                        data: {
+                            latitude: lat,
+                            longitude: lng
+                        },
+                        url: "savecords.php",
+                        success: function(response) {
+                            if (response == "success") {
+                                console.log(response);
                             } else {
-                                console.log(status);
+                                console.log(response);
                             }
-                        })
-                    },
-                    drop_pins: function() {
-                        var bounds = map.getBounds();
-                        var top_left = bounds.getNorthEast();
-                        var bot_right = bounds.getSouthWest();
-                        var hdif = Math.abs(top_left.lng() - bot_right.lng());
-                        var spacing = hdif / 4;
-
-                        var center = map.getCenter();
-                        var c1 = new google.maps.LatLng(center.lat(), center.lng() - spacing);
-                        var c2 = new google.maps.LatLng(center.lat(), center.lng());
-                        var c3 = new google.maps.LatLng(center.lat(), center.lng() + spacing);
-
-                        hyperlapse.lookat = c2;
-                        pivot_pin.setPosition(c2);
-
-                        snapToRoad(c1, function(result1) {
-                            start_pin.setPosition(result1);
-                            start_point = result1;
-
-                            snapToRoad(c3, function(result3) {
-                                end_pin.setPosition(result3);
-                                end_point = result3;
-                                changeHash();
-                            });
-                        });
-                    }
-                };
-
-
-                var scn = gui.addFolder('screen');
-                scn.add(o, 'screen_width', window.innerHeight).listen();
-                scn.add(o, 'screen_height', window.innerHeight).listen();
-
-                var parameters = gui.addFolder('parameters');
-
-                var distance_between_points_control = parameters.add(o, 'distance_between_points', 5, 100);
-                distance_between_points_control.onChange(function(value) {
-                    hyperlapse.setDistanceBetweenPoint(value);
+                        },
+                        error: function() {
+                            alert('An error occured');
+                        }
+                    });
                 });
 
-                var max_points = parameters.add(o, 'max_points', 10, 300);
-                max_points.onChange(function(value) {
-                    hyperlapse.setMaxPoints(value);
-                });
-
-                var fov_control = parameters.add(o, 'fov', 1, 180);
-                fov_control.onChange(function(value) {
-                    hyperlapse.setFOV(value);
-                });
-
-                var pitch_control = parameters.add(o, 'elevation', -1000, 1000);
-                pitch_control.onChange(function(value) {
-                    _elevation = value;
-                    hyperlapse.elevation_offset = value;
-                    changeHash();
-                });
-
-                var millis_control = parameters.add(o, 'millis', 10, 250);
-                millis_control.onChange(function(value) {
-                    hyperlapse.millis = value;
-                });
-
-                var offset_x_control = parameters.add(o, 'offset_x', -360, 360);
-                offset_x_control.onChange(function(value) {
-                    hyperlapse.offset.x = value;
-                });
-
-                var offset_y_control = parameters.add(o, 'offset_y', -180, 180);
-                offset_y_control.onChange(function(value) {
-                    hyperlapse.offset.y = value;
-                });
-
-                var offset_z_control = parameters.add(o, 'offset_z', -360, 360);
-                offset_z_control.onChange(function(value) {
-                    hyperlapse.offset.z = value;
-                });
-
-                var position_x_control = parameters.add(o, 'position_x', -360, 360).listen();
-                position_x_control.onChange(function(value) {
-                    hyperlapse.position.x = value;
-                });
-
-                var position_y_control = parameters.add(o, 'position_y', -180, 180).listen();
-                position_y_control.onChange(function(value) {
-                    hyperlapse.position.y = value;
-                });
-
-                var tilt_control = parameters.add(o, 'tilt', -Math.PI, Math.PI);
-                tilt_control.onChange(function(value) {
-                    hyperlapse.tilt = value;
-                });
-
-                var lookat_control = parameters.add(o, 'use_lookat')
-                lookat_control.onChange(function(value) {
-                    hyperlapse.use_lookat = value;
-                });
-
-                parameters.open();
-
-
-                var play_controls = gui.addFolder('play controls');
-                play_controls.add(hyperlapse, 'play');
-                play_controls.add(hyperlapse, 'pause');
-                play_controls.add(hyperlapse, 'next');
-                play_controls.add(hyperlapse, 'prev');
-                play_controls.open();
-
-                gui.add(o, 'drop_pins');
-                gui.add(o, 'generate');
-                gui.add(hyperlapse, 'load');
-
-
-                window.addEventListener('resize', function() {
+                window.addEventListener('resize', function () {
                     hyperlapse.setSize(window.innerWidth, window.innerHeight);
                     o.screen_width = window.innerWidth;
                     o.screen_height = window.innerHeight;
@@ -441,6 +315,19 @@
     </head>
 
     <body>
+        <div id="pano" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; z-index:-1;"></div>
+        <div id="controls">
+            <div id="map" style="width: 800px; height: 600px; float: left; padding: 0;"></div>
+            <div id="controls" style="">
+                <form id="map_form">
+                    <input type="text" name="address" id="address" />
+                    <button type="submit" id="searchButton">Search</button>
+                    <button id="save">Sla punten op</button>
+                </form>
+            </div>
+            <textarea rows="30" cols="65" id="output"></textarea>
+            <button id="tester">test</button>
+        </div>
 
     </body>
 

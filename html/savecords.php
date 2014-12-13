@@ -20,4 +20,5 @@ if ($conn->query($query) === TRUE)
 {
     echo "Error: " . $query . "<br>" . $conn->error;
 }
+$conn->close();
 ?>
