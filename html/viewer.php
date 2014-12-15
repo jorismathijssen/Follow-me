@@ -384,7 +384,6 @@
                         });
                     }
                 };
-                /*
 
 
                 var scn = gui.addFolder('screen');
@@ -468,7 +467,6 @@
                 gui.add(o, 'drop_pins');
                 gui.add(o, 'generate');
                 gui.add(hyperlapse, 'load');
-*/
 
 
                 window.addEventListener('resize', function () {

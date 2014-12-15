@@ -21,8 +21,12 @@
             var _elevation = 0;
             var _route_markers = [];
 
+            /**
+             * Init the website.
+             */
             function init() {
 
+                //parse the markers from the URL. And use the locations for the points
                 if (window.location.hash) {
                     parts = window.location.hash.substr(1).split(',');
                     start_point = new google.maps.LatLng(parts[0], parts[1]);
@@ -32,7 +36,12 @@
                 }
 
                 /* Map */
-
+                /**
+                 * Fucntion to make markers snap to roads easy
+                 * @param  {Marker}   point    Marker for the point
+                 * @param  {dropped} callback callback to check if the marker is dropped
+                 * @return {position}            New position of the marker
+                 */
                 function snapToRoad(point, callback) {
                     var request = {
                         origin: point,
@@ -45,23 +54,29 @@
                     });
                 }
 
+                /**
+                 * Change the url based on the postion of the markers.
+                 * @return {string} string and placed in the url.
+                 */
                 function changeHash() {
                     window.location.hash = start_pin.getPosition().lat() + ',' + start_pin.getPosition().lng() + ',' + pivot_pin.getPosition().lat() + ',' + pivot_pin.getPosition().lng() + ',' + end_pin.getPosition().lat() + ',' + end_pin.getPosition().lng() + ',' + _elevation;
                 }
 
+                //creating a road maps
                 var mapOpt = {
                     mapTypeId: google.maps.MapTypeId.ROADMAP,
                     center: start_point,
                     zoom: 15
                 };
 
+                //init images for the markers
                 var start = 'start.png';
                 var looks = 'eye.png';
                 var eind = 'eind.png';
 
                 map = new google.maps.Map(document.getElementById("map"), mapOpt);
                 geocoder = new google.maps.Geocoder();
-
+x
                 var overlay = new google.maps.StreetViewCoverageLayer();
                 overlay.setMap(map);
 
@@ -125,6 +140,11 @@
                     changeHash();
                 });
 
+                /**
+                 * Find location based on search
+                 * @param  {string} address location, street, P.O.I.
+                 * @return {Location}         Location where the search is
+                 */
                 function findAddress(address) {
                     geocoder.geocode({
                         'address': address
@@ -161,8 +181,8 @@
                     height: window.innerHeight,
                     zoom: 2,
                     use_lookat: true,
-                    distance_between_points: 5,
-                    max_points: 100,
+                    distance_between_points: 10,
+                    max_points: 300,
                     elevation: _elevation
                 });
 
