@@ -1,0 +1,508 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"ar",
+				"article	Tag"
+			],
+			[
+				"p",
+				"p	Tag"
+			],
+			[
+				"set",
+				"setDistanceBetweenPoint"
+			],
+			[
+				"s",
+				"src"
+			],
+			[
+				"a",
+				"ajax"
+			],
+			[
+				"onLoa",
+				"onLoadComplete"
+			],
+			[
+				"hyper",
+				"hyperlapse"
+			],
+			[
+				"hyp",
+				"hyperlapse"
+			],
+			[
+				"lat",
+				"latitude"
+			],
+			[
+				"insert",
+				"mysql_insert_id"
+			],
+			[
+				"start",
+				"start_pin"
+			],
+			[
+				"get",
+				"getDay"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"contents": "<!DOCTYPE html>\n<html>\n\n<head>\n    <meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\" />\n    <title>Follow Me - Joris Mathijssen</title>\n\n    <script src=\"https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false\" type=\"text/javascript\"></script>\n    <script src=\"http://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js\" type=\"text/javascript\"></script>\n    <script src=\"js/dat.gui.min.js\"></script>\n    <script src=\"js/three.min.js\"></script>\n    <script src=\"js/GSVPano.js\"></script>\n    <script src=\"../js/Hyperlapse.js\"></script>\n    <script>\n            //creating start up vars.\n            var start_point = new google.maps.LatLng(48.85877000000001, 2.293130000000019);\n            var end_point = new google.maps.LatLng(48.859260000000006, 2.2938300000000003);\n            var lookat_point = new google.maps.LatLng(48.858228924927595, 2.294524215344154);\n            var map, directions_renderer, directions_service, streetview_service, geocoder;\n            var start_pin, end_pin, pivot_pin, camera_pin;\n            var _elevation = 0;\n            var _route_markers = [];\n\n            function init() {\n\n                if (window.location.hash) {\n                    parts = window.location.hash.substr(1).split(',');\n                    start_point = new google.maps.LatLng(parts[0], parts[1]);\n                    lookat_point = new google.maps.LatLng(parts[2], parts[3]);\n                    end_point = new google.maps.LatLng(parts[4], parts[5]);\n                    _elevation = parts[6] || 0;\n                }\n\n                /* Map */\n\n                function snapToRoad(point, callback) {\n                    var request = {\n                        origin: point,\n                        destination: point,\n                        travelMode: google.maps.TravelMode[\"DRIVING\"]\n                    };\n                    directions_service.route(request, function (response, status) {\n                        if (status == \"OK\") callback(response.routes[0].overview_path[0]);\n                        else callback(null);\n                    });\n                }\n\n                function changeHash() {\n                    window.location.hash = start_pin.getPosition().lat() + ',' + start_pin.getPosition().lng() + ',' + pivot_pin.getPosition().lat() + ',' + pivot_pin.getPosition().lng() + ',' + end_pin.getPosition().lat() + ',' + end_pin.getPosition().lng() + ',' + _elevation;\n                }\n\n                var mapOpt = {\n                    mapTypeId: google.maps.MapTypeId.ROADMAP,\n                    center: start_point,\n                    zoom: 15\n                };\n\n                var start = 'img/start.png';\n                var looks = 'img/eye.png';\n                var eind = 'img/eind.png';\n\n                map = new google.maps.Map(document.getElementById(\"map\"), mapOpt);\n                geocoder = new google.maps.Geocoder();\n\n                var overlay = new google.maps.StreetViewCoverageLayer();\n                overlay.setMap(map);\n\n                directions_service = new google.maps.DirectionsService();\n                directions_renderer = new google.maps.DirectionsRenderer({\n                    draggable: false,\n                    markerOptions: {\n                        visible: false\n                    }\n                });\n                directions_renderer.setMap(map);\n                directions_renderer.setOptions({\n                    preserveViewport: true\n                });\n\n                camera_pin = new google.maps.Marker({\n                    position: start_point,\n                    map: map,\n                    visible: false\n                });\n\n                start_pin = new google.maps.Marker({\n                    position: start_point,\n                    draggable: true,\n                    map: map,\n                    icon: start\n                });\n\n                google.maps.event.addListener(start_pin, 'dragend', function (event) {\n                    snapToRoad(start_pin.getPosition(), function (result) {\n                        start_pin.setPosition(result);\n                        start_point = result;\n                        changeHash();\n                    });\n                });\n\n                end_pin = new google.maps.Marker({\n                    position: end_point,\n                    draggable: true,\n                    map: map,\n                    icon: eind\n                });\n\n                google.maps.event.addListener(end_pin, 'dragend', function (event) {\n                    snapToRoad(end_pin.getPosition(), function (result) {\n                        end_pin.setPosition(result);\n                        end_point = result;\n                        changeHash();\n                    });\n                });\n\n                pivot_pin = new google.maps.Marker({\n                    position: lookat_point,\n                    draggable: true,\n                    map: map,\n                    icon: looks\n                });\n\n                google.maps.event.addListener(pivot_pin, 'dragend', function (event) {\n                    hyperlapse.setLookat(pivot_pin.getPosition());\n                    changeHash();\n                });\n\n                function findAddress(address) {\n                    geocoder.geocode({\n                        'address': address\n                    }, function (results, status) {\n                        if (status == google.maps.GeocoderStatus.OK) {\n                            map.setCenter(results[0].geometry.location);\n                            o.drop_pins();\n                        } else {\n                            console.log(\"Geocode was not successful for the following reason: \" + status);\n                        }\n                    });\n                }\n\n                var search = document.getElementById('searchButton');\n                search.addEventListener('click', function (event) {\n                    event.preventDefault();\n                    findAddress(document.getElementById(\"address\").value);\n                }, false);\n\n\n                /* Hyperlapse */\n\n                var pano = document.getElementById('pano');\n                var is_moving = false;\n                var px, py;\n                var onPointerDownPointerX = 0,\n                onPointerDownPointerY = 0;\n\n                var hyperlapse = new Hyperlapse(pano, {\n                    lookat: lookat_point,\n                    fov: 80,\n                    millis: 50,\n                    width: window.innerWidth,\n                    height: window.innerHeight,\n                    zoom: 2,\n                    use_lookat: true,\n                    distance_between_points: 5,\n                    max_points: 100,\n                    elevation: _elevation\n                });\n\n\n\n                hyperlapse.onError = function (e) {\n                    console.log(\"ERROR: \" + e.message);\n                };\n\n                hyperlapse.onRouteProgress = function (e) {\n                    _route_markers.push(new google.maps.Marker({\n                        position: e.point.location,\n                        draggable: false,\n                        icon: \"img/dot_marker.png\",\n                        map: map\n                    }));\n                };\n\n                hyperlapse.onRouteComplete = function (e) {\n                    directions_renderer.setDirections(e.response);\n                    console.log(\"Number of Points: \" + hyperlapse.length());\n                    hyperlapse.load();\n                };\n\n                hyperlapse.onLoadProgress = function (e) {\n                    console.log(\"Loading: \" + (e.position + 1) + \" of \" + hyperlapse.length());\n                };\n\n                hyperlapse.onLoadComplete = function (e) {\n                    console.log(\"\" +\n                        \"Start: \" + start_pin.getPosition().toString() +\n                        \"<br>End: \" + end_pin.getPosition().toString() +\n                        \"<br>Lookat: \" + pivot_pin.getPosition().toString() +\n                        \"<br>Ready.\");\n                };\n\n                hyperlapse.onFrame = function (e) {\n                    console.log(\"\" +\n                        \"Start: \" + start_pin.getPosition().toString() +\n                        \"<br>End: \" + end_pin.getPosition().toString() +\n                        \"<br>Lookat: \" + pivot_pin.getPosition().toString() +\n                        \"<br>Position: \" + (e.position + 1) + \" of \" + hyperlapse.length());\n                    camera_pin.setPosition(e.point.location);\n                };\n\n                pano.addEventListener('mousedown', function (e) {\n                    e.preventDefault();\n\n                    is_moving = true;\n\n                    onPointerDownPointerX = e.clientX;\n                    onPointerDownPointerY = e.clientY;\n\n                    px = hyperlapse.position.x;\n                    py = hyperlapse.position.y;\n\n                }, false);\n\n                pano.addEventListener('mousemove', function (e) {\n                    e.preventDefault();\n                    var f = hyperlapse.fov() / 500;\n\n                    if (is_moving) {\n                        var dx = (onPointerDownPointerX - e.clientX) * f;\n                        var dy = (e.clientY - onPointerDownPointerY) * f;\n                        hyperlapse.position.x = px + dx; // reversed dragging direction (thanks @mrdoob!)\n                        hyperlapse.position.y = py + dy;\n\n                        o.position_x = hyperlapse.position.x;\n                        o.position_y = hyperlapse.position.y;\n                    }\n\n                }, false);\n\n                pano.addEventListener('mouseup', function () {\n                    is_moving = false;\n\n                    hyperlapse.position.x = px;\n                    //hyperlapse.position.y = py;\n                }, false);\n\n                var myBtn = document.getElementById('myBtn');\n\n                tester.addEventListener('click', function(event) {\n                    $.ajax({\n                        url: 'getcords.php',\n                        data: \"dataString\",\n                        dataType: 'html',\n                        success: function(data)\n                        {\n                            $('#output').html();\n\n                            $('#output').html(data);\n                        }\n                    });\n                });\n\n                save.addEventListener('click', function(event) {\n                    var lat = pivot_pin.getPosition().lat();\n                    var lng = pivot_pin.getPosition().lng();\n                    //use an AJAX function to save the lat/lng to the data base\n                    $.ajax({\n                        type: 'POST',\n                        data: {\n                            latitude: lat,\n                            longitude: lng\n                        },\n                        url: \"savecords.php\",\n                        success: function(response) {\n                            if (response == \"success\") {\n                                console.log(response);\n                            } else {\n                                console.log(response);\n                            }\n                        },\n                        error: function() {\n                            alert('An error occured');\n                        }\n                    });\n                });\n\n                routesave.addEventListener('click', function(event) {\n                    var looklat = pivot_pin.getPosition().lat();\n                    var looklng = pivot_pin.getPosition().lng();\n                    var startlat = start_pin.getPosition().lat();\n                    var startlng = start_pin.getPosition().lng();\n                    var stoplat = end_pin.getPosition().lat();\n                    var stoplng = end_pin.getPosition().lng();\n                    //use an AJAX function to save the lat/lng to the data base\n                    $.ajax({\n                        type: 'POST',\n                        data: {\n                            looklat: looklat,\n                            looklng: looklng,\n                            startlat: startlat,\n                            startlng: startlng,\n                            stoplat: stoplat,\n                            stoplng: stoplng\n                        },\n                        url: \"saveroute.php\",\n                        success: function(response) {\n                            if (response == \"success\") {\n                                console.log(response);\n                            } else {\n                                console.log(response);\n                            }\n                        },\n                        error: function() {\n                            alert('An error occured');\n                        }\n                    });\n                });\n\nwindow.addEventListener('resize', function () {\n    hyperlapse.setSize(window.innerWidth, window.innerHeight);\n    o.screen_width = window.innerWidth;\n    o.screen_height = window.innerHeight;\n}, false);\n\nvar show_ui = true;\ndocument.addEventListener('keydown', onKeyDown, false);\n\nfunction onKeyDown(event) {\n\n    switch (event.keyCode) {\n        case 72:\n        /* H */\n        show_ui = !show_ui;\n        document.getElementById(\"controls\").style.opacity = (show_ui) ? 1 : 0;\n        break;\n\n        case 190:\n        /* > */\n        hyperlapse.next();\n        break;\n\n        case 188:\n        /* < */\n        hyperlapse.prev();\n        break;\n    }\n\n};\n\no.generate();\n}\n\nwindow.onload = init;\n</script>\n</head>\n\n<body>\n    <div id=\"pano\" style=\"position: absolute; left: 0; top: 0; right: 0; bottom: 0; z-index:-1;\"></div>\n    <div id=\"controls\">\n        <div id=\"map\" style=\"width: 800px; height: 600px; float: left; padding: 0;\"></div>\n        <div id=\"controls\" style=\"\">\n            <form id=\"map_form\">\n                <input type=\"text\" name=\"address\" id=\"address\" />\n                <button type=\"submit\" id=\"searchButton\">Search</button>\n                <button id=\"save\">Sla punten op</button>\n            </form>\n        </div>\n        <div style=\"float:right;\">\n            <input type=\"text\" name=\"routename\" id=\"routename\" placeholder=\"route name\"/>\n            <button id=\"routesave\">Sla route op</button>\n        </div>\n        <textarea rows=\"30\" cols=\"65\" id=\"output\"></textarea>\n        <button id=\"tester\">test</button>\n    </div>\n\n</body>\n\n</html>\n",
+			"file": "/opt/lampp/htdocs/Follow-me/html/index.php",
+			"file_size": 14457,
+			"file_write_time": 130676389785831400,
+			"settings":
+			{
+				"buffer_size": 14457,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "<?php\ninclude 'config.php';\n\n$latitude = $_POST[ 'latitude'];\n$longitude = $_POST[ 'longitude'];\n\n$conn= new mysqli($servername, $username, $password, $dbname);\n\nif ($conn->connect_error)\n{\n	die(\"Connection failed: \" . $conn->connect_error);\n}\n\n$query=\"INSERT INTO locations (id, name, longitude, latitude) VALUES (null, 'Doe', '$longitude', '$latitude')\";\n\nif ($conn->query($query) === TRUE)\n{\n	echo \"success\";\n} else\n{\n	echo \"Error: \" . $query . \"<br>\" . $conn->error;\n}\n$conn->close();\n?>\n",
+			"file": "/opt/lampp/htdocs/Follow-me/html/savecords.php",
+			"file_size": 492,
+			"file_write_time": 130676400492191280,
+			"settings":
+			{
+				"buffer_size": 492,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "<?php\ninclude 'config.php';\n\n\n$looklat = $_POST[ 'looklat'];\n$looklng = $_POST[ 'looklng'];\n$startlat = $_POST[ 'startlat'];\n$startlng = $_POST[ 'startlng'];\n$stoplat = $_POST[ 'stoplat'];\n$stoplng = $_POST[ 'stoplng'];\n\n$conn= new mysqli($servername, $username, $password, $dbname);\n\nif ($conn->connect_error)\n{\n    die(\"Connection failed: \" . $conn->connect_error);\n}\n\n$query=\"INSERT INTO locations (id, name, longitude, latitude) VALUES (null, 'look', '$looklng', '$looklat')\";\n$query2=\"INSERT INTO locations (id, name, longitude, latitude) VALUES (null, 'start'', '$startlng', '$startlat')\";\n$query3=\"INSERT INTO locations (id, name, longitude, latitude) VALUES (null, 'stop', '$stoplng', '$stoplat')\";\n\nif ($conn->query($query) === TRUE && $conn->query($query2) === TRUE && $conn->query($query3) === TRUE) {\n	$value1 = (($conn->insert_id) - 1);\n	$value2 = ($conn->insert_id);\n	$value3 = (($conn->insert_id) - 2);\n\n	$query4=\"INSERT INTO route (id, start_pos_id, end_pos_id, look_pos_id) VALUES (null, '$value1', '$value2', '$value3')\";\n    if($conn->query($query4) === TRUE) {\n      echo \"success\";\n  }\n  else {\n     echo \"Error 1: \" . $query4 . \"<br>\" . $conn->error;\n }\n} else {\n    echo \"Error 2: \" . $query3 . \"<br>\" . $conn->error;\n}\n\n$conn->close();\n?>\n",
+			"file": "/opt/lampp/htdocs/Follow-me/html/saveroute.php",
+			"file_size": 1260,
+			"file_write_time": 130676401781191260,
+			"settings":
+			{
+				"buffer_size": 1263,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"selected_items":
+		[
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"git pull",
+				"Git: Pull"
+			],
+			[
+				"git push",
+				"Git: Push"
+			],
+			[
+				"git commit",
+				"Git: Commit"
+			],
+			[
+				"git add",
+				"Git: Add Current File"
+			],
+			[
+				"w3c",
+				"W3C Validators: Validate HTML5"
+			],
+			[
+				"col",
+				"Color Picker"
+			],
+			[
+				"list",
+				"Package Control: List Packages"
+			],
+			[
+				"GIT ADD",
+				"Git: Add Current File"
+			],
+			[
+				"git comm",
+				"Git: Commit"
+			],
+			[
+				"colo",
+				"Color Picker"
+			],
+			[
+				"color",
+				"Color Picker"
+			],
+			[
+				"git ad",
+				"Git: Add Current File"
+			],
+			[
+				"w3",
+				"W3C Validators: Validate HTML5"
+			],
+			[
+				"GIT PULL",
+				"Git: Pull"
+			],
+			[
+				"W3",
+				"W3C Validators: Validate HTML5"
+			],
+			[
+				"W3C",
+				"W3C Validators: Validate HTML5"
+			],
+			[
+				"git",
+				"Git: Pull"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"snip",
+				"Snippet: html"
+			],
+			[
+				"isntall",
+				"Package Control: Install Package"
+			],
+			[
+				"package",
+				"Package Control: List Packages"
+			],
+			[
+				"Package Control: remove",
+				"Package Control: Remove Package"
+			],
+			[
+				"Package Control: install",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ins",
+				"Package Control: Install Package"
+			],
+			[
+				"remove",
+				"Package Control: Remove Package"
+			],
+			[
+				"pack",
+				"Package Control: Remove Package"
+			],
+			[
+				"phpfmt",
+				"phpfmt: build autocomplete database"
+			],
+			[
+				"INSTALL",
+				"Package Control: Install Package"
+			],
+			[
+				"install ",
+				"Package Control: Install Package"
+			],
+			[
+				"instal",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 575.0
+	},
+	"console":
+	{
+		"height": 139.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404' + 'e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/opt/lampp/htdocs/Follow-me"
+	],
+	"file_history":
+	[
+		"/opt/lampp/htdocs/Follow-me/html/creator.php",
+		"/opt/lampp/htdocs/Internettechnologie/tekenen.html",
+		"/opt/lampp/htdocs/Internettechnologie/avans.svg",
+		"/opt/lampp/htdocs/Follow-me/html/viewer.php",
+		"/opt/lampp/htdocs/Follow-me/html/index.php",
+		"/home/joris/.config/sublime-text-3/Packages/HTML-CSS-JS Prettify/.jsbeautifyrc",
+		"/opt/lampp/htdocs/Follow-me/html/js/GSVPano.js",
+		"/opt/lampp/htdocs/Follow-me/html/config.php",
+		"/opt/lampp/htdocs/Follow-me/html/saveroute.php",
+		"/opt/lampp/htdocs/Follow-me/html/getcords.php",
+		"/opt/lampp/htdocs/Follow-me/html/config.php.example",
+		"/opt/lampp/htdocs/Follow-me/html/tester.html",
+		"/opt/lampp/htdocs/Follow-me/html/simple.html",
+		"/home/joris/.config/sublime-text-3/Packages/PHPSimpleRefactor/PHPSimpleRefactor.sublime-settings",
+		"/home/joris/.config/sublime-text-3/Packages/phpfmt/message",
+		"/home/joris/.config/sublime-text-3/Packages/phpfmt/phpfmt.sublime-settings",
+		"/home/joris/.config/sublime-text-3/Packages/User/phpfmt.sublime-settings",
+		"/opt/lampp/htdocs/Follow-me/docs/scripts/prettify/Apache-License-2.0.txt",
+		"/opt/lampp/htdocs/Follow-me/LICENSE",
+		"/home/joris/.config/sublime-text-3/Packages/HTML-CSS-JS Prettify/HTMLPrettify.sublime-settings",
+		"/home/joris/school/Follow-me/.gitignore",
+		"/home/joris/school/Follow-me/html/index.php",
+		"/home/joris/.config/sublime-text-3/Packages/GitGutter/GitGutter.sublime-settings",
+		"/home/joris/school/Follow-me/html/Followme.sublime-project",
+		"/home/joris/.config/sublime-text-3/Packages/Git/Git.sublime-settings",
+		"/home/joris/.config/sublime-text-3/Packages/User/Git.sublime-settings",
+		"/home/joris/test.html",
+		"/home/joris/Documents/output.html"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 93.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"png",
+			"img",
+			"A",
+			"hyperlapse.",
+			"play",
+			"handleDirectionsRoute",
+			"reset",
+			"generate",
+			"genera",
+			"canvas",
+			"hyperlapse.",
+			"var o",
+			"var 0",
+			"pano",
+			"`",
+			"save",
+			"eye",
+			"eye\\",
+			"camera_pin",
+			"logo"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"a",
+			"'"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 2,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "/opt/lampp/htdocs/Follow-me/html/index.php",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 14457,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6824,
+								6824
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/PHP/PHP.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4359.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "/opt/lampp/htdocs/Follow-me/html/savecords.php",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 492,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								343,
+								343
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/PHP/PHP.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "/opt/lampp/htdocs/Follow-me/html/saveroute.php",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1263,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								591,
+								591
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/PHP/PHP.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 26.0
+	},
+	"input":
+	{
+		"height": 33.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.git":
+	{
+		"height": 112.0
+	},
+	"project": "followme.sublime-project",
+	"replace":
+	{
+		"height": 48.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 358.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html>
 
-    <head>
-        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-        <title>Follow Me - Joris Mathijssen</title>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Follow Me - Joris Mathijssen</title>
 
-        <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false" type="text/javascript"></script>
-        <script src="http://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js" type="text/javascript"></script>
-        <script src="js/dat.gui.min.js"></script>
-        <script src="js/three.min.js"></script>
-        <script src="js/GSVPano.js"></script>
-        <script src="../js/Hyperlapse.js"></script>
-        <script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false" type="text/javascript"></script>
+    <script src="http://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js" type="text/javascript"></script>
+    <script src="js/dat.gui.min.js"></script>
+    <script src="js/three.min.js"></script>
+    <script src="js/GSVPano.js"></script>
+    <script src="../js/Hyperlapse.js"></script>
+    <script>
             //creating start up vars.
             var start_point = new google.maps.LatLng(48.85877000000001, 2.293130000000019);
             var end_point = new google.maps.LatLng(48.859260000000006, 2.2938300000000003);
@@ -24,7 +24,7 @@
             /**
              * Init the website.
              */
-            function init() {
+             function init() {
 
                 //parse the markers from the URL. And use the locations for the points
                 if (window.location.hash) {
@@ -42,7 +42,7 @@
                  * @param  {dropped} callback callback to check if the marker is dropped
                  * @return {position}            New position of the marker
                  */
-                function snapToRoad(point, callback) {
+                 function snapToRoad(point, callback) {
                     var request = {
                         origin: point,
                         destination: point,
@@ -58,7 +58,7 @@
                  * Change the url based on the postion of the markers.
                  * @return {string} string and placed in the url.
                  */
-                function changeHash() {
+                 function changeHash() {
                     window.location.hash = start_pin.getPosition().lat() + ',' + start_pin.getPosition().lng() + ',' + pivot_pin.getPosition().lat() + ',' + pivot_pin.getPosition().lng() + ',' + end_pin.getPosition().lat() + ',' + end_pin.getPosition().lng() + ',' + _elevation;
                 }
 
@@ -70,13 +70,13 @@
                 };
 
                 //init images for the markers
-                var start = 'start.png';
-                var looks = 'eye.png';
-                var eind = 'eind.png';
+                var start = 'img/start.png';
+                var looks = 'img/eye.png';
+                var eind = 'img/eind.png';
 
                 map = new google.maps.Map(document.getElementById("map"), mapOpt);
                 geocoder = new google.maps.Geocoder();
-x
+
                 var overlay = new google.maps.StreetViewCoverageLayer();
                 overlay.setMap(map);
 
@@ -145,7 +145,7 @@ x
                  * @param  {string} address location, street, P.O.I.
                  * @return {Location}         Location where the search is
                  */
-                function findAddress(address) {
+                 function findAddress(address) {
                     geocoder.geocode({
                         'address': address
                     }, function (results, status) {
@@ -171,7 +171,7 @@ x
                 var is_moving = false;
                 var px, py;
                 var onPointerDownPointerX = 0,
-                    onPointerDownPointerY = 0;
+                onPointerDownPointerY = 0;
 
                 var hyperlapse = new Hyperlapse(pano, {
                     lookat: lookat_point,
@@ -213,18 +213,18 @@ x
 
                 hyperlapse.onLoadComplete = function (e) {
                     console.log("" +
-                                "Start: " + start_pin.getPosition().toString() +
-                                "<br>End: " + end_pin.getPosition().toString() +
-                                "<br>Lookat: " + pivot_pin.getPosition().toString() +
-                                "<br>Ready.");
+                        "Start: " + start_pin.getPosition().toString() +
+                        "<br>End: " + end_pin.getPosition().toString() +
+                        "<br>Lookat: " + pivot_pin.getPosition().toString() +
+                        "<br>Ready.");
                 };
 
                 hyperlapse.onFrame = function (e) {
                     console.log("" +
-                                "Start: " + start_pin.getPosition().toString() +
-                                "<br>End: " + end_pin.getPosition().toString() +
-                                "<br>Lookat: " + pivot_pin.getPosition().toString() +
-                                "<br>Position: " + (e.position + 1) + " of " + hyperlapse.length());
+                        "Start: " + start_pin.getPosition().toString() +
+                        "<br>End: " + end_pin.getPosition().toString() +
+                        "<br>Lookat: " + pivot_pin.getPosition().toString() +
+                        "<br>Position: " + (e.position + 1) + " of " + hyperlapse.length());
                     camera_pin.setPosition(e.point.location);
                 };
 
@@ -336,63 +336,63 @@ x
                     });
                 });
 
-                window.addEventListener('resize', function () {
-                    hyperlapse.setSize(window.innerWidth, window.innerHeight);
-                    o.screen_width = window.innerWidth;
-                    o.screen_height = window.innerHeight;
-                }, false);
+window.addEventListener('resize', function () {
+    hyperlapse.setSize(window.innerWidth, window.innerHeight);
+    o.screen_width = window.innerWidth;
+    o.screen_height = window.innerHeight;
+}, false);
 
-                var show_ui = true;
-                document.addEventListener('keydown', onKeyDown, false);
+var show_ui = true;
+document.addEventListener('keydown', onKeyDown, false);
 
-                function onKeyDown(event) {
+function onKeyDown(event) {
 
-                    switch (event.keyCode) {
-                        case 72:
-                            /* H */
-                            show_ui = !show_ui;
-                            document.getElementById("controls").style.opacity = (show_ui) ? 1 : 0;
-                            break;
+    switch (event.keyCode) {
+        case 72:
+        /* H */
+        show_ui = !show_ui;
+        document.getElementById("controls").style.opacity = (show_ui) ? 1 : 0;
+        break;
 
-                        case 190:
-                            /* > */
-                            hyperlapse.next();
-                            break;
+        case 190:
+        /* > */
+        hyperlapse.next();
+        break;
 
-                        case 188:
-                            /* < */
-                            hyperlapse.prev();
-                            break;
-                    }
+        case 188:
+        /* < */
+        hyperlapse.prev();
+        break;
+    }
 
-                };
+};
 
-                o.generate();
-            }
+o.generate();
+}
 
-            window.onload = init;
-        </script>
-    </head>
+window.onload = init;
+</script>
+</head>
 
-    <body>
-        <div id="pano" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; z-index:-1;"></div>
-        <div id="controls">
-            <div id="map" style="width: 800px; height: 600px; float: left; padding: 0;"></div>
-            <div id="controls" style="">
-                <form id="map_form">
-                    <input type="text" name="address" id="address" />
-                    <button type="submit" id="searchButton">Search</button>
-                    <button id="save">Sla punten op</button>
-                </form>
-            </div>
-            <div style="float:right;">
-                    <input type="text" name="routename" id="routename" placeholder="route name"/>
-                    <button id="routesave">Sla route op</button>
-            </div>
-            <textarea rows="30" cols="65" id="output"></textarea>
-            <button id="tester">test</button>
+<body>
+    <div id="pano" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; z-index:-1;"></div>
+    <div id="controls">
+        <div id="map" style="width: 800px; height: 600px; float: left; padding: 0;"></div>
+        <div id="controls" style="">
+            <form id="map_form">
+                <input type="text" name="address" id="address" />
+                <button type="submit" id="searchButton">Search</button>
+                <button id="save">Sla punten op</button>
+            </form>
         </div>
+        <div style="float:right;">
+            <input type="text" name="routename" id="routename" placeholder="route name"/>
+            <button id="routesave">Sla route op</button>
+        </div>
+        <textarea rows="30" cols="65" id="output"></textarea>
+        <button id="tester">test</button>
+    </div>
 
-    </body>
+</body>
 
 </html>
