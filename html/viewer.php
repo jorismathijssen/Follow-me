@@ -1,81 +1,120 @@
 <!DOCTYPE html>
-<html> 
-<head> 
-    <title>[Playing] Follow Me - Joris Mathijssen</title> 
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Street View service</title>
+        <link rel="stylesheet" type="text/css" href="css/style.css">
+        <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
+        <script>
+            function initialize() {
+                var fenway = new google.maps.LatLng(42.345573, -71.098326);
+                var mapOptions = {
+                    center: fenway,
+                    zoom: 14
+                };
+                var map = new google.maps.Map(
+                    document.getElementById('map-canvas'), mapOptions);
+                var panoramaOptions = {
+                    position: fenway,
+                    pov: {
+                        heading: 34,
+                        pitch: 10
+                    }
+                };
+                var panorama = new google.maps.StreetViewPanorama(document.getElementById('pano'), panoramaOptions);
+                map.setStreetView(panorama);
 
-    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false" type="text/javascript"></script> 
-    <script src="js/three.min.js"></script>
-    <script src="js/GSVPano.js"></script>
-    <script src="../js/Hyperlapse.js"></script>
-    <script> 
-        function init() {
-            var hyperlapse = new Hyperlapse(document.getElementById('pano'), {
-                lookat: new google.maps.LatLng(37.81409525128964,-122.4775045005249),
-                zoom: 1,
-                use_lookat: true,
-                elevation: 80
-            });
+                //add buttons to field.
 
+                var leftControlDiv = document.createElement('div');
+                var leftControl = new leftControl(leftControlDiv, map);
 
-            hyperlapse.setSize(window.innerWidth, window.innerHeight);
+                var rightControlDiv = document.createElement('div');
+                var rightControl = new rightControl(rightControlDiv, map);
 
-            hyperlapse.onError = function(e) {
-                console.log(e);
-            };
-            
-            hyperlapse.onRouteComplete = function(e) {
-                hyperlapse.load();
-            };
+                leftControlDiv.index = 1;
+                panorama.controls[google.maps.ControlPosition.BOTTOM].push(leftControlDiv);
 
-            hyperlapse.onLoadComplete = function(e) {
-                hyperlapse.generate();
+                rightControlDiv.index = 1;
+                panorama.controls[google.maps.ControlPosition.BOTTOM].push(rightControlDiv);
             }
 
-            // Google Maps API stuff here...
-            var directions_service = new google.maps.DirectionsService();
-            var route = {
-                request:{
-                    origin: new google.maps.LatLng(48.85877000000001, 2.293130000000019),
-                    destination: new google.maps.LatLng(48.859260000000006, 2.2938300000000003),
-                    travelMode: google.maps.DirectionsTravelMode.DRIVING
-                }
-            };
-            directions_service.route(route.request, function(response, status) {
-                if (status == google.maps.DirectionsStatus.OK) {
-                    hyperlapse.generate( {route:response} );
-                    console.log('Generate 1 complete');
-                } else {
-                    console.log(status);
-                }
-            });
+            function leftControl(controlDiv, map) {
 
-            window.addEventListener('resize', function () {
-                hyperlapse.setSize(window.innerWidth, window.innerHeight);
-                o.screen_width = window.innerWidth;
-                o.screen_height = window.innerHeight;
-            }, false);
+                // Set CSS for the control border
+                var controlUI = document.createElement('div');
+                controlUI.style.backgroundColor = '#fff';
+                controlUI.style.border = '2px solid #fff';
+                controlUI.style.borderRadius = '3px';
+                controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+                controlUI.style.cursor = 'pointer';
+                controlUI.style.marginBottom = '22px';
+                controlUI.style.marginRight = '22px';
+                controlUI.style.textAlign = 'center';
+                controlUI.title = 'Click to recenter the map';
+                controlDiv.appendChild(controlUI);
 
+                // Set CSS for the control interior
+                var controlText = document.createElement('div');
+                controlText.style.color = 'rgb(25,25,25)';
+                controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+                controlText.style.fontSize = '16px';
+                controlText.style.lineHeight = '38px';
+                controlText.style.paddingLeft = '5px';
+                controlText.style.paddingRight = '5px';
+                controlText.innerHTML = '<';
+                controlUI.appendChild(controlText);
 
-            var pressed = false;
-            document.addEventListener('keydown', onKeyDown, false);
+                // Setup the click event listeners: simply set the map to
+                // Chicago
+                google.maps.event.addDomListener(controlUI, 'click', function() {
+                    console.log('LEFT');
+                });
 
-            function onKeyDown(event) {
+            }
 
-                switch (event.keyCode) {
-                    case 72:
-                    /* H */
-                    break;
-                }
+            function rightControl(controlDiv, map) {
 
-            };
+                // Set CSS for the control border
+                var controlUI1 = document.createElement('div');
+                controlUI1.style.backgroundColor = '#fff';
+                controlUI1.style.border = '2px solid #fff';
+                controlUI1.style.borderRadius = '3px';
+                controlUI1.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+                controlUI1.style.cursor = 'pointer';
+                controlUI1.style.marginBottom = '22px';
+                controlUI1.style.textAlign = 'center';
+                controlUI1.title = 'Click to recenter the map';
+                controlDiv.appendChild(controlUI1);
 
+                // Set CSS for the control interior
+                var controlText1 = document.createElement('div');
+                controlText1.style.color = 'rgb(25,25,25)';
+                controlText1.style.fontFamily = 'Roboto,Arial,sans-serif';
+                controlText1.style.fontSize = '16px';
+                controlText1.style.lineHeight = '38px';
+                controlText1.style.paddingLeft = '5px';
+                controlText1.style.paddingRight = '5px';
+                controlText1.innerHTML = '>';
+                controlUI1.appendChild(controlText1);
 
-        }
-        window.onload = init;
+                // Setup the click event listeners: simply set the map to
+                // Chicago
+                google.maps.event.addDomListener(controlUI1, 'click', function() {
+                    console.log('RIGHT');
+                });
 
-    </script> 
-</head> 
-<body> 
-    <div id="pano"></div>
-</body> 
+            }
+
+            google.maps.event.addDomListener(window, 'load', initialize);
+
+        </script>
+    </head>
+    <body>
+        <div id="pano">
+            <div id="map-canvas">
+            </div>
+        </div>
+    </body>
 </html>
+

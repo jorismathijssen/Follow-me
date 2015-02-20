@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-    <title>Follow Me - Joris Mathijssen</title>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <title>Follow Me - Joris Mathijssen</title>
 
-    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false" type="text/javascript"></script>
-    <script src="http://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js" type="text/javascript"></script>
-    <script src="js/dat.gui.min.js"></script>
-    <script src="js/three.min.js"></script>
-    <script src="js/GSVPano.js"></script>
-    <script src="../js/Hyperlapse.js"></script>
-    <script>
+        <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false" type="text/javascript"></script>
+        <script src="http://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js" type="text/javascript"></script>
+        <script src="js/dat.gui.min.js"></script>
+        <script src="js/three.min.js"></script>
+        <script src="js/GSVPano.js"></script>
+        <script src="../js/Hyperlapse.js"></script>
+        <script>
             //creating start up vars.
             var start_point = new google.maps.LatLng(48.85877000000001, 2.293130000000019);
             var end_point = new google.maps.LatLng(48.859260000000006, 2.2938300000000003);
@@ -144,122 +144,7 @@
                     findAddress(document.getElementById("address").value);
                 }, false);
 
-
-                /* Hyperlapse */
-
-                var pano = document.getElementById('pano');
-                var is_moving = false;
-                var px, py;
-                var onPointerDownPointerX = 0,
-                onPointerDownPointerY = 0;
-
-                var hyperlapse = new Hyperlapse(pano, {
-                    lookat: lookat_point,
-                    fov: 80,
-                    millis: 50,
-                    width: window.innerWidth,
-                    height: window.innerHeight,
-                    zoom: 2,
-                    use_lookat: true,
-                    distance_between_points: 5,
-                    max_points: 100,
-                    elevation: _elevation
-                });
-
-
-
-                hyperlapse.onError = function (e) {
-                    console.log("ERROR: " + e.message);
-                };
-
-                hyperlapse.onRouteProgress = function (e) {
-                    _route_markers.push(new google.maps.Marker({
-                        position: e.point.location,
-                        draggable: false,
-                        icon: "img/dot_marker.png",
-                        map: map
-                    }));
-                };
-
-                hyperlapse.onRouteComplete = function (e) {
-                    directions_renderer.setDirections(e.response);
-                    console.log("Number of Points: " + hyperlapse.length());
-                    hyperlapse.load();
-                };
-
-                hyperlapse.onLoadProgress = function (e) {
-                    console.log("Loading: " + (e.position + 1) + " of " + hyperlapse.length());
-                };
-
-                hyperlapse.onLoadComplete = function (e) {
-                    console.log("" +
-                        "Start: " + start_pin.getPosition().toString() +
-                        "<br>End: " + end_pin.getPosition().toString() +
-                        "<br>Lookat: " + pivot_pin.getPosition().toString() +
-                        "<br>Ready.");
-                };
-
-                hyperlapse.onFrame = function (e) {
-                    console.log("" +
-                        "Start: " + start_pin.getPosition().toString() +
-                        "<br>End: " + end_pin.getPosition().toString() +
-                        "<br>Lookat: " + pivot_pin.getPosition().toString() +
-                        "<br>Position: " + (e.position + 1) + " of " + hyperlapse.length());
-                    camera_pin.setPosition(e.point.location);
-                };
-
-                pano.addEventListener('mousedown', function (e) {
-                    e.preventDefault();
-
-                    is_moving = true;
-
-                    onPointerDownPointerX = e.clientX;
-                    onPointerDownPointerY = e.clientY;
-
-                    px = hyperlapse.position.x;
-                    py = hyperlapse.position.y;
-
-                }, false);
-
-                pano.addEventListener('mousemove', function (e) {
-                    e.preventDefault();
-                    var f = hyperlapse.fov() / 500;
-
-                    if (is_moving) {
-                        var dx = (onPointerDownPointerX - e.clientX) * f;
-                        var dy = (e.clientY - onPointerDownPointerY) * f;
-                        hyperlapse.position.x = px + dx; // reversed dragging direction (thanks @mrdoob!)
-                        hyperlapse.position.y = py + dy;
-
-                        o.position_x = hyperlapse.position.x;
-                        o.position_y = hyperlapse.position.y;
-                    }
-
-                }, false);
-
-                pano.addEventListener('mouseup', function () {
-                    is_moving = false;
-
-                    hyperlapse.position.x = px;
-                    //hyperlapse.position.y = py;
-                }, false);
-
-                var myBtn = document.getElementById('myBtn');
-
-                tester.addEventListener('click', function(event) {
-                    $.ajax({
-                        url: 'getcords.php',
-                        data: "dataString",
-                        dataType: 'html',
-                        success: function(data)
-                        {
-                            $('#output').html();
-
-                            $('#output').html(data);
-                        }
-                    });
-                });
-
+                //Save cords function
                 save.addEventListener('click', function(event) {
                     var lat = pivot_pin.getPosition().lat();
                     var lng = pivot_pin.getPosition().lng();
@@ -283,96 +168,31 @@
                         }
                     });
                 });
+            }
 
-                routesave.addEventListener('click', function(event) {
-                    var looklat = pivot_pin.getPosition().lat();
-                    var looklng = pivot_pin.getPosition().lng();
-                    var startlat = start_pin.getPosition().lat();
-                    var startlng = start_pin.getPosition().lng();
-                    var stoplat = end_pin.getPosition().lat();
-                    var stoplng = end_pin.getPosition().lng();
-                    //use an AJAX function to save the lat/lng to the data base
-                    $.ajax({
-                        type: 'POST',
-                        data: {
-                            looklat: looklat,
-                            looklng: looklng,
-                            startlat: startlat,
-                            startlng: startlng,
-                            stoplat: stoplat,
-                            stoplng: stoplng
-                        },
-                        url: "saveroute.php",
-                        success: function(response) {
-                            if (response == "success") {
-                                console.log(response);
-                            } else {
-                                console.log(response);
-                            }
-                        },
-                        error: function() {
-                            alert('An error occured');
-                        }
-                    });
-                });
+            window.onload = init;
+        </script>
+    </head>
 
-window.addEventListener('resize', function () {
-    hyperlapse.setSize(window.innerWidth, window.innerHeight);
-    o.screen_width = window.innerWidth;
-    o.screen_height = window.innerHeight;
-}, false);
-
-var show_ui = true;
-document.addEventListener('keydown', onKeyDown, false);
-
-function onKeyDown(event) {
-
-    switch (event.keyCode) {
-        case 72:
-        /* H */
-        show_ui = !show_ui;
-        document.getElementById("controls").style.opacity = (show_ui) ? 1 : 0;
-        break;
-
-        case 190:
-        /* > */
-        hyperlapse.next();
-        break;
-
-        case 188:
-        /* < */
-        hyperlapse.prev();
-        break;
-    }
-
-};
-
-o.generate();
-}
-
-window.onload = init;
-</script>
-</head>
-
-<body>
-    <div id="pano" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; z-index:-1;"></div>
-    <div id="controls">
-        <div id="map" style="width: 800px; height: 600px; float: left; padding: 0;"></div>
-        <div id="controls" style="">
-            <form id="map_form">
-                <input type="text" name="address" id="address" />
-                <button type="submit" id="searchButton">Search</button>
-                <button id="save">Sla punten op</button>
-            </form>
+    <body>
+        <div id="pano" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; z-index:-1;"></div>
+        <div id="controls">
+            <div id="map" style="width: 800px; height: 600px; float: left; padding: 0;"></div>
+            <div id="controls" style="">
+                <form id="map_form">
+                    <input type="text" name="address" id="address" />
+                    <button type="submit" id="searchButton">Search</button>
+                    <button id="save">Sla punten op</button>
+                </form>
+            </div>
+            <div style="float:right;">
+                <input type="text" name="routename" id="routename" placeholder="route name"/>
+                <button id="routesave">Sla route op</button>
+            </div>
+            <textarea rows="30" cols="65" id="output"></textarea>
+            <button id="tester">test</button>
         </div>
-        <div style="float:right;">
-            <input type="text" name="routename" id="routename" placeholder="route name"/>
-            <button id="routesave">Sla route op</button>
-        </div>
-        <textarea rows="30" cols="65" id="output"></textarea>
-        <button id="tester">test</button>
-    </div>
 
-</body>
+    </body>
 
 </html>

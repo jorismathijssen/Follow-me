@@ -1,0 +1,13 @@
+#pano {
+    width: 98vw;
+    height: 95vh;
+    position: inherit;
+}
+#map-canvas {
+    width: 200px;
+    height: 200px;
+    position: absolute;
+    z-index: 1000;
+    border-right:2px solid black;
+    border-bottom:2px solid black;
+}

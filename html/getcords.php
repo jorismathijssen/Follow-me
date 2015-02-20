@@ -8,7 +8,7 @@ if ($conn->connect_error)
     die("Connection failed: " . $conn->connect_error);
 }
 
-$query = "SELECT `locations`.`longitude`, `locations`.`latitude`, `route`.`id` FROM `locations`, `route` WHERE (`locations`.`id` = route.start_pos_id) OR (`locations`.`id` = route.end_pos_id) OR (`locations`.`id` = route.look_pos_id)";
+$query = "SELECT * FROM `locations`";
 $result = $conn->query($query);
 
 if ($result->num_rows > 0) {

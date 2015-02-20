@@ -11,7 +11,7 @@ if ($conn->connect_error)
 	die("Connection failed: " . $conn->connect_error);
 }
 
-$query="INSERT INTO locations (id, name, longitude, latitude) VALUES (null, 'Doe', '$longitude', '$latitude')";
+$query="INSERT INTO locations (id, longitude, latitude) VALUES (null, '$longitude', '$latitude')";
 
 if ($conn->query($query) === TRUE)
 {
