@@ -5,9 +5,13 @@
         <title>Street View service</title>
         <link rel="stylesheet" type="text/css" href="css/style.css">
         <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
+        <script src="http://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js" type="text/javascript"></script>
         <script>
+            var addresses = [new google.maps.LatLng(42.345573, -71.098326), new google.maps.LatLng(51.574182,4.690748)],       counter = 0;
+
             function initialize() {
-                var fenway = new google.maps.LatLng(42.345573, -71.098326);
+                //getCord();
+                var fenway = new google.maps.LatLng(51.574182,4.690748);
                 var mapOptions = {
                     center: fenway,
                     zoom: 14
@@ -27,16 +31,32 @@
                 //add buttons to field.
 
                 var leftControlDiv = document.createElement('div');
-                var leftControl = new leftControl(leftControlDiv, map);
+                var leftControler = new leftControl(leftControlDiv, panorama);
 
                 var rightControlDiv = document.createElement('div');
-                var rightControl = new rightControl(rightControlDiv, map);
+                var rightControler = new rightControl(rightControlDiv, panorama);
 
                 leftControlDiv.index = 1;
                 panorama.controls[google.maps.ControlPosition.BOTTOM].push(leftControlDiv);
 
                 rightControlDiv.index = 1;
                 panorama.controls[google.maps.ControlPosition.BOTTOM].push(rightControlDiv);
+            }
+
+            function getCord() {
+                $.ajax({
+                    url: 'getcords.php',
+                    data: "dataString",
+                    dataType: 'html',
+                    success: function(data)
+                    {
+                        var obj = JSON && JSON.parse(data) || $.parseJSON(data);
+                        for (var key in obj) {
+
+                            addresses.push(new google.maps.LatLng(obj[key]['longitude'], obj[key]['latitude']));
+                        }
+                    }
+                });
             }
 
             function leftControl(controlDiv, map) {
@@ -68,7 +88,16 @@
                 // Setup the click event listeners: simply set the map to
                 // Chicago
                 google.maps.event.addDomListener(controlUI, 'click', function() {
-                    console.log('LEFT');
+                    if(counter == 0)
+                    {
+                        counter = addresses.length;
+                        map.setPosition(addresses[counter]);
+                    }
+                    else{
+
+                        counter = (counter - 1);
+                        map.setPosition(addresses[counter]);
+                    }
                 });
 
             }
@@ -101,7 +130,9 @@
                 // Setup the click event listeners: simply set the map to
                 // Chicago
                 google.maps.event.addDomListener(controlUI1, 'click', function() {
-                    console.log('RIGHT');
+                    counter = (counter + 1) % addresses.length;
+                    console.log(addresses[counter]);
+                    map.setPosition(addresses[counter]);
                 });
 
             }

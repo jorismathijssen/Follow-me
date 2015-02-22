@@ -12,12 +12,12 @@ $query = "SELECT * FROM `locations`";
 $result = $conn->query($query);
 
 if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc())
-    {
-        echo "id: " . $row["id"]. " - Longitude: " . $row["longitude"]. " - Latitude: " . $row["latitude"] . "\n";
+    while($r = mysqli_fetch_assoc($result)) {
+        $rows[] = $r;
     }
+    print json_encode($rows);
 } else {
-    echo "there are " . $result->num_rows . " points in the list";
+    echo "Error";
 }
 $conn->close();
 ?>
