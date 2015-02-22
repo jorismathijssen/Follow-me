@@ -7,10 +7,10 @@
         <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
         <script src="http://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js" type="text/javascript"></script>
         <script>
-            var addresses = [new google.maps.LatLng(42.345573, -71.098326), new google.maps.LatLng(51.574182,4.690748)],       counter = 0;
+            var addresses = [new google.maps.LatLng(42.345573, -71.098326)],       counter = 0;
 
             function initialize() {
-                //getCord();
+                getCord();
                 var fenway = new google.maps.LatLng(51.574182,4.690748);
                 var mapOptions = {
                     center: fenway,
@@ -53,11 +53,15 @@
                         var obj = JSON && JSON.parse(data) || $.parseJSON(data);
                         for (var key in obj) {
 
-                            addresses.push(new google.maps.LatLng(obj[key]['longitude'], obj[key]['latitude']));
+                            addresses.push(new google.maps.LatLng(obj[key]['latitude'], obj[key]['longitude']));
+
+                            /*TODO: Find a good street view point*/
                         }
                     }
                 });
             }
+
+            /*TODO: Check why left click needs 2 clicks and right click needs 1 before working*/
 
             function leftControl(controlDiv, map) {
 
@@ -85,8 +89,7 @@
                 controlText.innerHTML = '<';
                 controlUI.appendChild(controlText);
 
-                // Setup the click event listeners: simply set the map to
-                // Chicago
+                // Setup the click event listeners
                 google.maps.event.addDomListener(controlUI, 'click', function() {
                     if(counter == 0)
                     {
@@ -127,8 +130,7 @@
                 controlText1.innerHTML = '>';
                 controlUI1.appendChild(controlText1);
 
-                // Setup the click event listeners: simply set the map to
-                // Chicago
+                // Setup the click event listeners
                 google.maps.event.addDomListener(controlUI1, 'click', function() {
                     counter = (counter + 1) % addresses.length;
                     console.log(addresses[counter]);
@@ -145,6 +147,7 @@
         <div id="pano">
             <div id="map-canvas">
             </div>
+            <div id="hintbox-top"><p><h3>The eifel tower</h3><br /> Lots of bull crap Illum in ullamco id legam id o sint familiaritatem, ex nulla eram veniam.</p></div>
         </div>
     </body>
 </html>
