@@ -3,15 +3,16 @@
     <head>
         <meta charset="utf-8">
         <title>Street View service</title>
+        <link rel="stylesheet" type="text/css" href="css/normalize.css">
         <link rel="stylesheet" type="text/css" href="css/style.css">
         <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
         <script src="http://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js" type="text/javascript"></script>
         <script>
-            var addresses = [new google.maps.LatLng(42.345573, -71.098326)],       counter = 0;
+            var addresses = [], counter = 0;
 
             function initialize() {
                 getCord();
-                var fenway = new google.maps.LatLng(51.574182,4.690748);
+                var fenway = addresses[1];
                 var mapOptions = {
                     center: fenway,
                     zoom: 14
@@ -55,10 +56,13 @@
 
                             addresses.push(new google.maps.LatLng(obj[key]['latitude'], obj[key]['longitude']));
 
-                            /*TODO: Find a good street view point*/
+                            console.log(addresses.toString());
                         }
                     }
                 });
+                console.log('getCords is klaar');
+
+                console.log(addresses.toString());
             }
 
             /*TODO: Check why left click needs 2 clicks and right click needs 1 before working*/
@@ -147,7 +151,7 @@
         <div id="pano">
             <div id="map-canvas">
             </div>
-            <div id="hintbox-top"><p><h3>The eifel tower</h3><br /> Lots of bull crap Illum in ullamco id legam id o sint familiaritatem, ex nulla eram veniam.</p></div>
+            <div id="hintbox-top"><h1>De eifeltoren</h1><p>Lots of bull crap Illum in ullamco id legam id o sint familiaritatem, ex nulla eram veniam.</p></div>
         </div>
     </body>
 </html>
