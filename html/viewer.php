@@ -11,40 +11,6 @@
             var addresses = [], counter = 0;
 
             function initialize() {
-                getCord();
-                var fenway = addresses[1];
-                var mapOptions = {
-                    center: fenway,
-                    zoom: 14
-                };
-                var map = new google.maps.Map(
-                    document.getElementById('map-canvas'), mapOptions);
-                var panoramaOptions = {
-                    position: fenway,
-                    pov: {
-                        heading: 34,
-                        pitch: 10
-                    }
-                };
-                var panorama = new google.maps.StreetViewPanorama(document.getElementById('pano'), panoramaOptions);
-                map.setStreetView(panorama);
-
-                //add buttons to field.
-
-                var leftControlDiv = document.createElement('div');
-                var leftControler = new leftControl(leftControlDiv, panorama);
-
-                var rightControlDiv = document.createElement('div');
-                var rightControler = new rightControl(rightControlDiv, panorama);
-
-                leftControlDiv.index = 1;
-                panorama.controls[google.maps.ControlPosition.BOTTOM].push(leftControlDiv);
-
-                rightControlDiv.index = 1;
-                panorama.controls[google.maps.ControlPosition.BOTTOM].push(rightControlDiv);
-            }
-
-            function getCord() {
                 $.ajax({
                     url: 'getcords.php',
                     data: "dataString",
@@ -58,12 +24,40 @@
 
                             console.log(addresses.toString());
                         }
+                        var fenway = addresses[1];
+                        var mapOptions = {
+                            center: fenway,
+                            zoom: 14
+                        };
+                        var map = new google.maps.Map(
+                            document.getElementById('map-canvas'), mapOptions);
+                        var panoramaOptions = {
+                            position: fenway,
+                            pov: {
+                                heading: 34,
+                                pitch: 10
+                            }
+                        };
+                        var panorama = new google.maps.StreetViewPanorama(document.getElementById('pano'), panoramaOptions);
+                        map.setStreetView(panorama);
+
+                        //add buttons to field.
+
+                        var leftControlDiv = document.createElement('div');
+                        var leftControler = new leftControl(leftControlDiv, panorama);
+
+                        var rightControlDiv = document.createElement('div');
+                        var rightControler = new rightControl(rightControlDiv, panorama);
+
+                        leftControlDiv.index = 1;
+                        panorama.controls[google.maps.ControlPosition.BOTTOM].push(leftControlDiv);
+
+                        rightControlDiv.index = 1;
+                        panorama.controls[google.maps.ControlPosition.BOTTOM].push(rightControlDiv);
                     }
                 });
-                console.log('getCords is klaar');
-
-                console.log(addresses.toString());
             }
+
 
             /*TODO: Check why left click needs 2 clicks and right click needs 1 before working*/
 
