@@ -8,6 +8,7 @@
         <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
         <script src="http://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js" type="text/javascript"></script>
         <script>
+            //creating the array's before use globaly, is this right?
             var addresses = [], counter = 0;
             var titel = [];
             var desc = [];
@@ -31,15 +32,15 @@
                             heading.push(obj[key]['heading']);
                             pitch.push(obj[key]['pitch']);
                         }
-                        var fenway = addresses[0];
+                        var location = addresses[0]; //seting the first location this way.
                         var mapOptions = {
-                            center: fenway,
+                            center: location,
                             zoom: 14
-                        };
+                        }; //set the map options for top left map
                         var map = new google.maps.Map(
                             document.getElementById('map-canvas'), mapOptions);
                         var panoramaOptions = {
-                            position: fenway,
+                            position: location,
                             zoom: 0.2,
                             pov: {
                                 heading: parseFloat(heading[0]),
@@ -47,7 +48,7 @@
                             },
                             disableDefaultUI: true
 
-                        };
+                        };//set the map options for panorama map
                         var panorama = new google.maps.StreetViewPanorama(document.getElementById('pano'), panoramaOptions);
                         map.setStreetView(panorama);
 
@@ -65,10 +66,13 @@
                         rightControlDiv.index = 1;
                         panorama.controls[google.maps.ControlPosition.BOTTOM].push(rightControlDiv);
 
+                        //setting the titel and discription divs
                         var titelElement = document.getElementById("header");
                         titelElement.innerHTML = titel[0];
                         var descElement = document.getElementById("desc");
                         descElement.innerHTML = desc[0];
+
+                        //Creating a listener for the image click.
                         $("#imagebox").click(function(){
                             console.log('Hallo');
                         });
@@ -174,7 +178,7 @@
             <div id="map-canvas">
             </div>
             <div id="imagebox"><img src="img/eiffeltoren.jpg"></div>
-            <div id="hintbox-top"><h1 id="header"></h1><p id="desc">Lots of bull crap Illum in ullamco id legam id o sint familiaritatem, ex nulla eram veniam.</p></div>
+            <div id="hintbox-top"><h1 id="header"></h1><p id="desc"></p></div>
         </div>
     </body>
 </html>
