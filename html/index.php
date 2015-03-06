@@ -5,8 +5,9 @@
         <title>Profielwerkstuk - Elvira Mathijssen</title>
         <link rel="stylesheet" type="text/css" href="css/normalize.css">
         <link rel="stylesheet" type="text/css" href="css/style.css">
+        <link href="css/jquery.bxslider.css" rel="stylesheet" />
         <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
-        <script src="http://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js" type="text/javascript"></script>
+        <script src="js/jquery.min.js"></script>
         <script>
             //creating the array's before use globaly, is this right?
             var addresses = [], counter = 0;
@@ -172,8 +173,10 @@
         <div id="pano">
             <div id="map-canvas">
             </div>
-            <div id="imagebox"><img src="img/eiffeltoren.jpg"></div>
-            <div id="hintbox-top"><h1 id="header"></h1><p id="desc"></p></div>
+            <div id="imagebox"></div>
+            <div>
+                <div id="hintbox-top"><h1 id="header"></h1><p id="desc"></p></div>
+            </div>
         </div>
     </body>
 </html>
