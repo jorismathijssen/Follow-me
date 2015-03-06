@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>Street View service</title>
+        <title>Profielwerkstuk - Elvira Mathijssen</title>
         <link rel="stylesheet" type="text/css" href="css/normalize.css">
         <link rel="stylesheet" type="text/css" href="css/style.css">
         <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
@@ -23,24 +23,27 @@
                     dataType: 'html',
                     success: function(data)
                     {
-                        var obj = JSON && JSON.parse(data) || $.parseJSON(data);
-                        for (var key in obj) {
-                            //Put data in the array's
+                        var obj = JSON && JSON.parse(data) || $.parseJSON(data); //Parsing JSON
+
+                        for (var key in obj) { //Put data in the array's
+
                             addresses.push(new google.maps.LatLng(obj[key]['latitude'], obj[key]['longitude']));
                             titel.push(obj[key]['titel']);
                             desc.push(obj[key]['beschrijving']);
                             heading.push(obj[key]['heading']);
                             pitch.push(obj[key]['pitch']);
+
                         }
-                        console.log('WTF');
-                        var location = addresses[0]; //seting the first location this way.
+
+                        var location = addresses[0]; //seting the first location and putting it in a map.
                         var mapOptions = {
                             center: location,
                             zoom: 14
-                        }; //set the map options for top left map
+                        };
                         var map = new google.maps.Map(
                             document.getElementById('map-canvas'), mapOptions);
-                        var panoramaOptions = {
+
+                        var panoramaOptions = { //seting the first Panorama settings.
                             position: location,
                             zoom: 0.2,
                             pov: {
@@ -48,22 +51,17 @@
                                 pitch: parseFloat(pitch[0])
                             },
                             disableDefaultUI: true
-
-                        };//set the map options for panorama map
+                        };
                         var panorama = new google.maps.StreetViewPanorama(document.getElementById('pano'), panoramaOptions);
                         map.setStreetView(panorama);
 
-                        //add buttons to field.
-
-                        var leftControlDiv = document.createElement('div');
+                        var leftControlDiv = document.createElement('div'); //Adding left controls
                         var leftControler = new leftControl(leftControlDiv, panorama, map);
-
-                        var rightControlDiv = document.createElement('div');
-                        var rightControler = new rightControl(rightControlDiv, panorama, map);
-
                         leftControlDiv.index = 1;
                         panorama.controls[google.maps.ControlPosition.BOTTOM].push(leftControlDiv);
 
+                        var rightControlDiv = document.createElement('div'); //Adding right controls
+                        var rightControler = new rightControl(rightControlDiv, panorama, map);
                         rightControlDiv.index = 1;
                         panorama.controls[google.maps.ControlPosition.BOTTOM].push(rightControlDiv);
 
@@ -80,9 +78,6 @@
                     }
                 });
             }
-
-
-            /*TODO: Check why left click needs 2 clicks and right click needs 1 before working*/
 
             function leftControl(controlDiv, map, smallmap) {
 
@@ -171,7 +166,6 @@
             }
 
             google.maps.event.addDomListener(window, 'load', initialize);
-
         </script>
     </head>
     <body>
