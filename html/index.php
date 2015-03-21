@@ -5,9 +5,10 @@
         <title>Profielwerkstuk - Elvira Mathijssen</title>
         <link rel="stylesheet" type="text/css" href="css/normalize.css">
         <link rel="stylesheet" type="text/css" href="css/style.css">
-        <link href="css/jquery.bxslider.css" rel="stylesheet" />
-        <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
+        <link rel="stylesheet" type="text/css" href="css/flexslider.css">
         <script src="js/jquery.min.js"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
+        <script src="js/jquery.flexslider.js"></script>
         <script>
             //creating the array's before use globaly, is this right?
             var addresses = [], counter = 0;
@@ -75,6 +76,11 @@
                         //Creating a listener for the image click.
                         $("#imagebox").click(function(){
                             console.log('Hallo');
+                        });
+
+                        $('.flexslider').flexslider({
+                            animation: "slide",
+                            controlNav: "thumbnails"
                         });
                     }
                 });
@@ -173,7 +179,24 @@
         <div id="pano">
             <div id="map-canvas">
             </div>
-            <div id="imagebox"></div>
+            <div id="imagebox">
+                <div class="flexslider">
+                    <ul class="slides">
+                        <li data-thumb="img/1.jpg">
+                            <img src="img/1.jpg" />
+                        </li>
+                        <li data-thumb="img/2.jpg">
+                            <img src="img/2.jpg" />
+                        </li>
+                        <li data-thumb="img/3.jpg">
+                            <img src="img/3.jpg" />
+                        </li>
+                        <li data-thumb="img/4.jpg">
+                            <img src="img/4.jpg" />
+                        </li>
+                    </ul>
+                </div>
+            </div>
             <div>
                 <div id="hintbox-top"><h1 id="header"></h1><p id="desc"></p></div>
             </div>
