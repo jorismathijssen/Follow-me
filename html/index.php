@@ -5,10 +5,8 @@
         <title>Profielwerkstuk - Elvira Mathijssen</title>
         <link rel="stylesheet" type="text/css" href="css/normalize.css">
         <link rel="stylesheet" type="text/css" href="css/style.css">
-        <link rel="stylesheet" type="text/css" href="css/flexslider.css">
         <script src="js/jquery.min.js"></script>
         <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
-        <script src="js/jquery.flexslider.js"></script>
         <script>
             //creating the array's before use globaly, is this right?
             var addresses = [], counter = 0;
@@ -52,7 +50,7 @@
                                 heading: parseFloat(heading[0]),
                                 pitch: parseFloat(pitch[0])
                             },
-                            disableDefaultUI: true
+                            disableDefaultUI: false
                         };
                         var panorama = new google.maps.StreetViewPanorama(document.getElementById('pano'), panoramaOptions);
                         map.setStreetView(panorama);
@@ -73,15 +71,17 @@
                         var descElement = document.getElementById("desc");
                         descElement.innerHTML = desc[0];
 
-                        //Creating a listener for the image click.
-                        $("#imagebox").click(function(){
-                            console.log('Hallo');
+                        $(".imagebox2").click(function(){
+                            console.log('settings:' + Math.round(panorama.getPov().heading) + ' pitch: ' + Math.round(panorama.getPov().pitch));
+                            console.log('Lat: ' +  Math.round(panorama.getPosition().lat() *100000)/100000 + ' long: ' + Math.round(panorama.getPosition().lng()*100000)/100000);
                         });
 
-                        $('.flexslider').flexslider({
-                            animation: "slide",
-                            controlNav: "thumbnails"
+                        $(".img").attr("src", "img/" + titel[0] + "/1.jpg");
+
+                        $("#help").click(function(){
+                            alert("Klik de knoppen onderin om langs de bezienswaardigheden te gaan\nKijk rond door met de muis in hoofdscherm te bewegen en loop gerust rond!");
                         });
+
                     }
                 });
             }
@@ -126,6 +126,7 @@
                     titelElement.innerHTML = titel[counter];
                     var descElement = document.getElementById("desc");
                     descElement.innerHTML = desc[counter];
+                    $(".img").attr("src", "img/" + titel[counter]  + "/1.jpg");
                 });
 
             }
@@ -168,6 +169,7 @@
                     titelElement.innerHTML = titel[counter];
                     var descElement = document.getElementById("desc");
                     descElement.innerHTML = desc[counter];
+                    $(".img").attr("src", "img/" + titel[counter]  + "/1.jpg");
                 });
 
             }
@@ -179,27 +181,13 @@
         <div id="pano">
             <div id="map-canvas">
             </div>
-            <div id="imagebox">
-                <div class="flexslider">
-                    <ul class="slides">
-                        <li data-thumb="img/1.jpg">
-                            <img src="img/1.jpg" />
-                        </li>
-                        <li data-thumb="img/2.jpg">
-                            <img src="img/2.jpg" />
-                        </li>
-                        <li data-thumb="img/3.jpg">
-                            <img src="img/3.jpg" />
-                        </li>
-                        <li data-thumb="img/4.jpg">
-                            <img src="img/4.jpg" />
-                        </li>
-                    </ul>
-                </div>
+            <div class="imagebox2" id="imagebox">
+                <img class="img" src="img/Eiffeltoren/1.jpg">
             </div>
             <div>
                 <div id="hintbox-top"><h1 id="header"></h1><p id="desc"></p></div>
             </div>
+            <div id="help"><h3>Wilt u hulp ?</h3></div>
         </div>
     </body>
 </html>
